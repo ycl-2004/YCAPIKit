@@ -1,12 +1,3 @@
-# macOS
 .DS_Store
-
-# Xcode
-Build/
-DerivedData/
-*.xcworkspace
-*.xcuserdata
-*.xcodeproj/project.xcworkspace
-
-# Swift Package
 .build/
+.swiftpm/
