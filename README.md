@@ -1,32 +1,39 @@
 # YCAPIKit
 
+![Swift](https://img.shields.io/badge/Swift-5.9-orange)
+![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20macOS-blue)
+![SPM](https://img.shields.io/badge/SPM-supported-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 > A resilient, observable hosted-LLM runtime for SwiftUI apps.
 
-YCAPIKit provides a reusable AI runtime layer that standardizes multi-provider LLM integration, reliability handling, structured output, and observability — so each app does not need to rebuild these systems from scratch.
+YCAPIKit is a reusable AI runtime layer that standardizes multi-provider LLM integration, reliability handling, structured output, and observability — so each app does not need to rebuild these systems from scratch.
 
 ---
 
 ## TL;DR
 
-YCAPIKit gives you:
+YCAPIKit provides:
 
-* multi-provider LLM integration (OpenAI, Gemini, Anthropic, NVIDIA, Mistral, Zhipu)
-* built-in retry, backoff, and fallback orchestration
-* route-based model selection (`primary / chunk / polish / repair`)
-* structured JSON validation with recovery
-* request-level observability (latency, retries, fallback paths)
+* Multi-provider LLM integration (OpenAI, Gemini, Anthropic, NVIDIA, Mistral, Zhipu)
+* Built-in retry, backoff, and fallback orchestration
+* Route-based model selection (`primary / chunk / polish / repair`)
+* Structured JSON validation with automatic recovery
+* Request-level observability (latency, retry count, fallback path)
 
 Designed as an **AI runtime layer**, not just an API wrapper.
 
 ---
 
-## Quick Start
+## Installation
 
-### 1. Add the package
+### Swift Package Manager
 
 ```swift
-.package(path: "../Packages/YCAPIKit")
+.package(url: "https://github.com/ycl-2004/YCAPIKit.git", branch: "main")
 ```
+
+Then add the product:
 
 ```swift
 .product(name: "YCAPIKit", package: "YCAPIKit")
@@ -34,30 +41,29 @@ Designed as an **AI runtime layer**, not just an API wrapper.
 
 ---
 
-### 2. Add settings UI
+## Quick Start
+
+### 1. Configure
 
 ```swift
-import SwiftUI
 import YCAPIKit
 
-struct SettingsScreen: View {
-    @State private var configuration = HostedAIConfiguration.recommended(service: .openAI)
-
-    var body: some View {
-        Form {
-            HostedAISettingsSection(configuration: $configuration)
-        }
-    }
-}
+var configuration = HostedAIConfiguration.recommended(service: .openAI)
 ```
 
 ---
 
-### 3. Generate text
+### 2. Create Client
 
 ```swift
 let client = HostedAIClientFactory.makeClient(configuration: configuration)
+```
 
+---
+
+### 3. Generate Text
+
+```swift
 let result = try await client.generateText(
     systemPrompt: "You summarize clearly.",
     userPrompt: "Summarize this in 5 bullet points."
@@ -66,7 +72,7 @@ let result = try await client.generateText(
 
 ---
 
-### 4. Generate structured JSON
+### 4. Generate Structured JSON
 
 ```swift
 struct Outline: Decodable {
@@ -76,7 +82,7 @@ struct Outline: Decodable {
 
 let outline = try await client.generateJSON(
     systemPrompt: "Return JSON only.",
-    userPrompt: "Create a short outline.",
+    userPrompt: "Create a short project outline.",
     as: Outline.self
 )
 ```
@@ -87,45 +93,27 @@ let outline = try await client.generateJSON(
 
 YCAPIKit is designed for production-style AI workflows:
 
-* summarizing long documents with `chunk + polish` routing
-* extracting structured JSON for downstream automation
-* retrying and failing over when providers degrade
-* switching providers without rewriting app logic
-* monitoring latency and failures in production
-
-Example scenarios:
-
-* A notes app chunks large input, summarizes each part, then polishes the result.
-* A backend tool extracts structured JSON and falls back to a repair route on failure.
-* A mobile app switches providers during outages without impacting user flows.
+* Summarizing long documents using `chunk + polish` routing
+* Extracting structured JSON for downstream automation
+* Retrying and failing over when providers degrade
+* Switching providers without rewriting app logic
+* Monitoring latency and failures in production
 
 ---
 
 ## Why YCAPIKit Exists
 
-Most apps add AI features by calling provider APIs directly.
+Most apps integrate AI by directly calling provider APIs.
 
 This leads to:
 
 * duplicated API wiring across apps
-* inconsistent retry and fallback behavior
-* poor visibility into failures and latency
+* inconsistent retry and fallback logic
 * fragile structured-output parsing
-* no standardized model routing
+* poor visibility into failures and latency
+* no standardized model routing strategy
 
-YCAPIKit solves these problems once and makes them reusable across applications.
-
----
-
-## Design Philosophy
-
-YCAPIKit is built around:
-
-* **App-agnostic** — no assumptions about product logic
-* **Reliability-first** — failures are expected and handled
-* **Structured over raw text** — machine-usable output matters
-* **Explicit routing** — apps control cost / latency tradeoffs
-* **Observable by default** — every request can be traced
+YCAPIKit solves these problems once and makes them reusable.
 
 ---
 
@@ -157,8 +145,8 @@ Cross-cutting concerns:
 
 * configurable retry policies
 * exponential backoff
-* transient failure detection (timeouts, 429, 5xx)
-* request timeouts and resource limits
+* timeout handling
+* transient failure recovery (429, network errors)
 
 ---
 
@@ -167,7 +155,6 @@ Cross-cutting concerns:
 * provider fallback (e.g., OpenAI → Gemini)
 * model fallback
 * route fallback (`primary → repair`)
-* configurable fallback strategies
 
 ---
 
@@ -176,124 +163,95 @@ Cross-cutting concerns:
 * JSON schema decoding
 * code fence stripping
 * partial JSON extraction
-* repair-route recovery on failure
+* repair-route recovery
 
 ---
 
 ### Observability
 
-Each request exposes:
+Each request captures:
 
-* provider + model
-* selected route
+* provider and model
+* route
 * retry count
-* fallback index
-* request duration
-* outcome (success / failure)
-* error category
+* fallback path
+* latency
+* outcome
 
-This enables:
+Enables:
 
-* latency dashboards
-* failure monitoring
+* latency monitoring
+* failure tracking
 * provider comparison
-* fallback-rate tracking
 
 ---
 
 ### Adaptive Routing (Future-ready)
 
-The runtime already surfaces signals for:
+Signals can be used for:
 
 * latency-aware provider selection
-* failure-driven fallback decisions
-* cost vs quality optimization
-* dynamic routing strategies
+* failure-driven routing
+* cost optimization
 
 ---
 
 ## End-to-End Request Flow
 
-1. App calls `HostedAIRuntime.generateText` or `generateJSON`
+1. App calls runtime (`generateText` / `generateJSON`)
 2. Runtime selects provider and route model
-3. Request is sent via `HostedAIClient`
-4. Transport applies timeout and retry policy
-5. Response is validated (JSON if needed)
-6. On failure:
-
-   * retry → fallback route → fallback provider
-7. Trace is emitted
-8. Final result returned to the app
+3. Request sent via client
+4. Retry + timeout applied
+5. Response validated
+6. Failure → retry / fallback / repair
+7. Trace emitted
+8. Result returned
 
 ---
 
-## Failure Scenarios And Recovery
+## Failure Scenarios and Recovery
 
 YCAPIKit assumes LLM systems fail.
 
-Common failure modes:
+Handles:
 
-* timeouts or network instability
+* timeouts
 * rate limiting (`429`)
-* invalid structured output
-* model unavailability
+* malformed JSON
+* provider outages
 
-Recovery flow:
+Recovery strategy:
 
-1. request fails
-2. retry with backoff
-3. fallback to:
-
-   * repair route, or
-   * backup provider
-4. JSON validation may trigger repair route
-5. trace captures retry + fallback path
-
-This ensures continuity under degraded conditions.
+* retry with backoff
+* fallback route
+* fallback provider
+* repair JSON
 
 ---
 
 ## Comparison
 
-| Capability         | Raw API Usage  | YCAPIKit              |
-| ------------------ | -------------- | -------------------- |
-| Retry handling     | manual         | built-in             |
-| Fallback routing   | custom per app | configurable runtime |
-| Structured JSON    | fragile        | validated + repair   |
-| Provider switching | invasive       | configuration-driven |
-| Routing            | manual         | built-in             |
-| Observability      | ad hoc         | trace hooks          |
+| Capability         | Raw API | YCAPIKit           |
+| ------------------ | ------- | ------------------ |
+| Retry handling     | manual  | built-in           |
+| Fallback           | none    | automatic          |
+| Structured JSON    | fragile | validated + repair |
+| Provider switching | hard    | configurable       |
+| Observability      | minimal | built-in           |
 
 ---
 
-## Benchmark Readiness
+## Project Structure
 
-YCAPIKit does not include fixed benchmarks, but exposes signals to measure:
-
-* p50 / p95 latency
-* retry rate
-* fallback rate
-* JSON failure rate
-* provider reliability
-
-This enables future evaluation dashboards.
-
----
-
-## Test Coverage
-
-Includes tests for:
-
-* API key resolution
-* environment fallback
-* route model selection
-* provider inference
-* health checks
-* JSON decoding (mocked)
-* retry recovery (429)
-* provider fallback
-* repair-route fallback
-* trace retry counts
+```
+YCAPIKit/
+├── Package.swift
+├── README.md
+├── Sources/
+│   └── YCAPIKit/
+├── Tests/
+│   └── YCAPIKitTests/
+```
 
 ---
 
@@ -315,29 +273,12 @@ Includes tests for:
 
 ## Environment Variables
 
-* OpenAI: `YCAIKIT_OPENAI_API_KEY`, `OPENAI_API_KEY`
-* Anthropic: `YCAIKIT_ANTHROPIC_API_KEY`
-* Gemini: `YCAIKIT_GEMINI_API_KEY`, `GOOGLE_API_KEY`
-* NVIDIA: `YCAIKIT_NVIDIA_API_KEY`
-* Mistral: `YCAIKIT_MISTRAL_API_KEY`
-* Zhipu: `YCAIKIT_ZHIPU_API_KEY`, `BIGMODEL_API_KEY`
-
----
-
-## Route-Based Model Split
-
-Supports:
-
-* `primary`
-* `chunk`
-* `polish`
-* `repair`
-
-Used to balance:
-
-* cost
-* latency
-* output quality
+* OPENAI_API_KEY
+* ANTHROPIC_API_KEY
+* GOOGLE_API_KEY / GEMINI_API_KEY
+* NVIDIA_API_KEY
+* MISTRAL_API_KEY
+* ZHIPU_API_KEY
 
 ---
 
@@ -346,31 +287,35 @@ Used to balance:
 YCAPIKit is **not**:
 
 * a memory system
-* a conversation/session manager
-* a vector database
 * an agent framework
+* a vector database
 * a training system
 
 It is a **hosted-LLM runtime layer**.
 
 ---
 
-## Future Work
+## Test Coverage
 
-* adaptive provider selection
-* streaming response support
-* token-aware context management
-* per-user preference memory
-* evaluation / benchmarking harness
+Includes tests for:
+
+* retry handling
+* provider fallback
+* JSON repair
+* routing logic
+* configuration resolution
 
 ---
 
-## Talking Points
+## Future Work
 
-This project can be discussed as:
+* streaming support
+* adaptive routing
+* evaluation harness
+* token-aware context management
 
-* multi-provider LLM runtime design
-* retry + fallback strategies for unreliable systems
-* structured-output validation pipelines
-* observability for AI systems
-* foundations for adaptive routing
+---
+
+## License
+
+MIT License
