@@ -3,22 +3,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "YCAIKit",
+    name: "YCAPIKit",
     platforms: [
         .iOS(.v17),
         .macOS(.v14),
     ],
     products: [
         .library(
-            name: "YCAIKit",
-            targets: ["YCAIKit"]
+            name: "YCAPIKit",
+            targets: ["YCAPIKit"]
         ),
     ],
     targets: [
-        .target(name: "YCAIKit"),
+        .target(name: "YCAPIKit"),
         .testTarget(
-            name: "YCAIKitTests",
-            dependencies: ["YCAIKit"]
+            name: "YCAPIKitTests",
+            dependencies: ["YCAPIKit"]
         ),
     ]
 )
