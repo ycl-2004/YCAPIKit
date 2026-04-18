@@ -33,7 +33,7 @@ func makeMockedSession(
 }
 
 private final class MockURLProtocol: URLProtocol, @unchecked Sendable {
-    static let sessionIdentifierHeader = "X-YCAIKit-Mock-Session"
+    static let sessionIdentifierHeader = "X-YCAPIKit-Mock-Session"
     private static let responders = LockedBox<[String: @Sendable (URLRequest) throws -> (Int, Data)]>([:])
 
     static func register(

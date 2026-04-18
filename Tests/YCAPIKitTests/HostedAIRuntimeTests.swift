@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import YCAIKit
+@testable import YCAPIKit
 
 struct HostedAIRuntimeTests {
     @Test

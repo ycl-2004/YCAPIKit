@@ -1,5 +1,5 @@
 import Testing
-@testable import YCAIKit
+@testable import YCAPIKit
 
 struct HostedAIConfigurationTests {
     @Test

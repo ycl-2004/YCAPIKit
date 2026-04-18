@@ -1,14 +1,14 @@
-# YCAIKit
+# YCAPIKit
 
 > A resilient, observable hosted-LLM runtime for SwiftUI apps.
 
-YCAIKit provides a reusable AI runtime layer that standardizes multi-provider LLM integration, reliability handling, structured output, and observability — so each app does not need to rebuild these systems from scratch.
+YCAPIKit provides a reusable AI runtime layer that standardizes multi-provider LLM integration, reliability handling, structured output, and observability — so each app does not need to rebuild these systems from scratch.
 
 ---
 
 ## TL;DR
 
-YCAIKit gives you:
+YCAPIKit gives you:
 
 * multi-provider LLM integration (OpenAI, Gemini, Anthropic, NVIDIA, Mistral, Zhipu)
 * built-in retry, backoff, and fallback orchestration
@@ -25,11 +25,11 @@ Designed as an **AI runtime layer**, not just an API wrapper.
 ### 1. Add the package
 
 ```swift
-.package(path: "../Packages/YCAIKit")
+.package(path: "../Packages/YCAPIKit")
 ```
 
 ```swift
-.product(name: "YCAIKit", package: "YCAIKit")
+.product(name: "YCAPIKit", package: "YCAPIKit")
 ```
 
 ---
@@ -38,7 +38,7 @@ Designed as an **AI runtime layer**, not just an API wrapper.
 
 ```swift
 import SwiftUI
-import YCAIKit
+import YCAPIKit
 
 struct SettingsScreen: View {
     @State private var configuration = HostedAIConfiguration.recommended(service: .openAI)
@@ -85,7 +85,7 @@ let outline = try await client.generateJSON(
 
 ## Example Use Cases
 
-YCAIKit is designed for production-style AI workflows:
+YCAPIKit is designed for production-style AI workflows:
 
 * summarizing long documents with `chunk + polish` routing
 * extracting structured JSON for downstream automation
@@ -101,7 +101,7 @@ Example scenarios:
 
 ---
 
-## Why YCAIKit Exists
+## Why YCAPIKit Exists
 
 Most apps add AI features by calling provider APIs directly.
 
@@ -113,13 +113,13 @@ This leads to:
 * fragile structured-output parsing
 * no standardized model routing
 
-YCAIKit solves these problems once and makes them reusable across applications.
+YCAPIKit solves these problems once and makes them reusable across applications.
 
 ---
 
 ## Design Philosophy
 
-YCAIKit is built around:
+YCAPIKit is built around:
 
 * **App-agnostic** — no assumptions about product logic
 * **Reliability-first** — failures are expected and handled
@@ -229,7 +229,7 @@ The runtime already surfaces signals for:
 
 ## Failure Scenarios And Recovery
 
-YCAIKit assumes LLM systems fail.
+YCAPIKit assumes LLM systems fail.
 
 Common failure modes:
 
@@ -255,7 +255,7 @@ This ensures continuity under degraded conditions.
 
 ## Comparison
 
-| Capability         | Raw API Usage  | YCAIKit              |
+| Capability         | Raw API Usage  | YCAPIKit              |
 | ------------------ | -------------- | -------------------- |
 | Retry handling     | manual         | built-in             |
 | Fallback routing   | custom per app | configurable runtime |
@@ -268,7 +268,7 @@ This ensures continuity under degraded conditions.
 
 ## Benchmark Readiness
 
-YCAIKit does not include fixed benchmarks, but exposes signals to measure:
+YCAPIKit does not include fixed benchmarks, but exposes signals to measure:
 
 * p50 / p95 latency
 * retry rate
@@ -343,7 +343,7 @@ Used to balance:
 
 ## Scope Boundaries
 
-YCAIKit is **not**:
+YCAPIKit is **not**:
 
 * a memory system
 * a conversation/session manager
